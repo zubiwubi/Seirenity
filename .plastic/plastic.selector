@@ -1,0 +1,4 @@
+repository "Seirenity/Seirenity@15669626891283@cloud"
+  path "/"
+    br "/main"
+    co "/main"
