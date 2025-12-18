@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: f3305ed1fee9a5d4fa64f29cf8360350
+DefaultImporter:
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/2DDemoScene.unity
+  uploadId: 62178

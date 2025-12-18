@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 61e75edd0eda59e44849804f8fc207c1
+NativeFormatImporter:
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Physic Materials/Ball.physicMaterial
+  uploadId: 62178

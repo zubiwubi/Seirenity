@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: f77615bcb622a144aad3bcae18c62268
+NativeFormatImporter:
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Materials/Water.mat
+  uploadId: 62178

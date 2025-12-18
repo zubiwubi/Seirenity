@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 6b981a193ca9b274b885b90ea84d7743
+timeCreated: 1428624148
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Documentation/How to.pdf
+  uploadId: 62178

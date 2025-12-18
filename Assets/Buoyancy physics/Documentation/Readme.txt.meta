@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 793f0b17f738eab4b81b74af32c6f9c7
+timeCreated: 1428614841
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Documentation/Readme.txt
+  uploadId: 62178

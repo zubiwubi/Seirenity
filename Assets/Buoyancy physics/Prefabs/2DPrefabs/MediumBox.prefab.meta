@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 0dc70d8d9e414d24a8ff2e29f4d0ce1b
+NativeFormatImporter:
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Prefabs/2DPrefabs/MediumBox.prefab
+  uploadId: 62178

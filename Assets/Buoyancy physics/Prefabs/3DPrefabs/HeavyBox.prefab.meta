@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4e12d643c4684694ebf7ea41ac561c8b
+timeCreated: 1428613494
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Prefabs/3DPrefabs/HeavyBox.prefab
+  uploadId: 62178

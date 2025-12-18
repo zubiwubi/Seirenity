@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f0b3fe3e0ebbdbe42b7d455ff91c668f
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Scripts/Buoyancy2D.cs
+  uploadId: 62178

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b1b266360ef1cf845a2319213b079b9a
+timeCreated: 1428612913
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Prefabs/3DPrefabs/LightBox.prefab
+  uploadId: 62178

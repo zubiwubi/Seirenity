@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: cdef3a358f733c141b7e89815dc16872
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Scripts/DemoScripts/MoveTexture.cs
+  uploadId: 62178

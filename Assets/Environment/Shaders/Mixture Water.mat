@@ -139,7 +139,7 @@ Material:
     - _RefractionTexture: 1
     - _RippleDensity: 7
     - _RippleSpeed: 1
-    - _Size: 2
+    - _Size: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -152,11 +152,11 @@ Material:
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _DarkFoamColour: {r: 0, g: 0.08758569, b: 0.3207547, a: 1}
-    - _DeepWater: {r: 0.18046981, g: 0.47073382, b: 0.8037735, a: 0.45882353}
+    - _DarkFoamColour: {r: 0, g: 0.17736204, b: 0.3647059, a: 1}
+    - _DeepWater: {r: 0.059658207, g: 0.39716557, b: 0.5018867, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColour: {r: 1, g: 1, b: 1, a: 1}
-    - _ShallowWater: {r: 0.47450984, g: 1, b: 0.9828763, a: 0.22745098}
+    - _ShallowWater: {r: 0.79811317, g: 1, b: 0.99397355, a: 0.22745098}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _WaterColour: {r: 0.20943394, g: 0.7405861, b: 1, a: 0.5803922}
   m_BuildTextureStacks: []

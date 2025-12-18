@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 0821ceb28608365409c5decec2d97839
+NativeFormatImporter:
+  userData: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 34353
+  packageName: Simple Buoyancy Physics
+  packageVersion: 1.0
+  assetPath: Assets/Buoyancy physics/Prefabs/2DPrefabs/LightBall.prefab
+  uploadId: 62178
