@@ -2922,8 +2922,8 @@
     "m_ObjectId": "1eb7a8c9fe3743839506f33704eee65d",
     "m_Title": "Choppiness",
     "m_Position": {
-        "x": -1543.999755859375,
-        "y": -1233.599853515625
+        "x": -1544.0001220703125,
+        "y": -1232.0
     }
 }
 
@@ -3360,8 +3360,8 @@
     "m_ObjectId": "24c3e2c77a5c43bb9b0162194fa4795a",
     "m_Title": "Foam",
     "m_Position": {
-        "x": -3667.199951171875,
-        "y": -784.0
+        "x": -3667.333251953125,
+        "y": -782.6666870117188
     }
 }
 
@@ -4200,8 +4200,8 @@
     "m_ObjectId": "44db771d69f74421832e05f84ae1edff",
     "m_Title": "Foam",
     "m_Position": {
-        "x": -1939.999755859375,
-        "y": 916.7998657226563
+        "x": -1940.0001220703125,
+        "y": 918.0000610351563
     }
 }
 
@@ -4633,8 +4633,8 @@
     "m_ObjectId": "4c0673fe5508451b9b98c97aa9446fe7",
     "m_Title": "Flow Map",
     "m_Position": {
-        "x": -5233.60009765625,
-        "y": 70.40000915527344
+        "x": -5233.33349609375,
+        "y": 72.0
     }
 }
 
@@ -5779,8 +5779,8 @@
     "m_ObjectId": "677bd636985b4f4fa8015dada79ae63e",
     "m_Title": "Foam Distance",
     "m_Position": {
-        "x": -3276.0,
-        "y": 631.1998901367188
+        "x": -3275.999755859375,
+        "y": 632.666748046875
     }
 }
 
@@ -6540,7 +6540,7 @@
     "m_StageCapability": 3,
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"3d0168d833d3239418983c8248b6c79f\",\"type\":3}}",
+        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"4ff09e2dd83f7f4469e8b1fe5120d43b\",\"type\":3}}",
         "m_Guid": ""
     },
     "m_DefaultType": 0
@@ -8691,8 +8691,8 @@
     "m_ObjectId": "bcf39f9ae02c42faaaeeddb13b6e26ff",
     "m_Title": "Water Refraction",
     "m_Position": {
-        "x": -3866.400390625,
-        "y": -2267.199951171875
+        "x": -3866.666748046875,
+        "y": -2266.0
     }
 }
 
@@ -9558,8 +9558,8 @@
     "m_ObjectId": "d56c815260c94615a3522aa6b76443ee",
     "m_Title": "Water Colour",
     "m_Position": {
-        "x": -3332.7998046875,
-        "y": -1295.2001953125
+        "x": -3332.666748046875,
+        "y": -1294.0
     }
 }
 
