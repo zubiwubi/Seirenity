@@ -80,6 +80,9 @@
         },
         {
             "m_Id": "584f3442968944f2a276aa61fe3f8ed6"
+        },
+        {
+            "m_Id": "26a58d80198040c49994e34b15737689"
         }
     ],
     "m_GroupDatas": [],
@@ -283,6 +286,9 @@
             },
             {
                 "m_Id": "584f3442968944f2a276aa61fe3f8ed6"
+            },
+            {
+                "m_Id": "26a58d80198040c49994e34b15737689"
             }
         ]
     },
@@ -517,10 +523,10 @@
     "m_ZTestMode": 4,
     "m_ZWriteControl": 0,
     "m_AlphaMode": 0,
-    "m_RenderFace": 2,
-    "m_AlphaClip": false,
-    "m_CastShadows": true,
-    "m_ReceiveShadows": true,
+    "m_RenderFace": 0,
+    "m_AlphaClip": true,
+    "m_CastShadows": false,
+    "m_ReceiveShadows": false,
     "m_DisableTint": false,
     "m_AdditionalMotionVectorMode": 0,
     "m_AlembicMotionVectors": false,
@@ -557,6 +563,40 @@
         "b": 0.0,
         "a": 1.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
+    "m_ObjectId": "26a58d80198040c49994e34b15737689",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "SurfaceDescription.AlphaClipThreshold",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "b081ab07bfae4a2ba3cff5e3602eefb1"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedDescriptor": "SurfaceDescription.AlphaClipThreshold"
 }
 
 {
@@ -1301,6 +1341,21 @@
 {
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "b081ab07bfae4a2ba3cff5e3602eefb1",
+    "m_Id": 0,
+    "m_DisplayName": "Alpha Clip Threshold",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "AlphaClipThreshold",
+    "m_StageCapability": 2,
+    "m_Value": 0.3799999952316284,
+    "m_DefaultValue": 0.5,
+    "m_Labels": []
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
     "m_ObjectId": "b4adc5a035c5409c8cdd2c3071dfc9a5",
     "m_Id": 3,
     "m_DisplayName": "Delta Time",
@@ -1389,10 +1444,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -568.800048828125,
-            "y": 485.6000671386719,
-            "width": 207.99996948242188,
-            "height": 430.3999328613281
+            "x": -1326.0001220703125,
+            "y": 513.3334350585938,
+            "width": 184.6666259765625,
+            "height": 252.0
         }
     },
     "m_Slots": [
@@ -1425,7 +1480,7 @@
         "tex2d"
     ],
     "m_Precision": 0,
-    "m_PreviewExpanded": true,
+    "m_PreviewExpanded": false,
     "m_DismissedVersion": 0,
     "m_PreviewMode": 0,
     "m_CustomColors": {
@@ -1668,10 +1723,10 @@
         "m_Expanded": true,
         "m_Position": {
             "serializedVersion": "2",
-            "x": -776.0000610351563,
-            "y": 530.4000854492188,
-            "width": 132.79998779296876,
-            "height": 33.5999755859375
+            "x": -1503.9998779296875,
+            "y": 549.3333740234375,
+            "width": 134.0001220703125,
+            "height": 36.0
         }
     },
     "m_Slots": [
