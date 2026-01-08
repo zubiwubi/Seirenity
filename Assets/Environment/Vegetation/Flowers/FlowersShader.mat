@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Grass
+  m_Name: FlowersShader
   m_Shader: {fileID: -6465566751694194690, guid: 873bf7f607adaea4898d0d62c867e489, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -25,7 +25,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: af270acd48b21d74c9568cd8d34fed21, type: 3}
+        m_Texture: {fileID: 2800000, guid: 9b9442be8f93ec847998eeba4a5ad271, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Wind_Texture:
@@ -52,18 +52,18 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0
-    - _Wind_Height: 0.5
-    - _Wind_Intensity: 0.2
-    - _Wind_Noise_Speed: 1
-    - _Wind_Speed: 0.3
+    - _Wind_Height: 0
+    - _Wind_Intensity: 0
+    - _Wind_Noise_Speed: 0
+    - _Wind_Speed: 0
     m_Colors:
     - _Bottom_Colour: {r: 0.6052052, g: 0.6289307, b: 0.3658873, a: 0}
     - _Colour: {r: 0, g: 0, b: 0, a: 0}
     - _Far_Colour: {r: 0, g: 0, b: 0, a: 1}
-    - _Near_Colour: {r: 0.6226415, g: 0.5641115, b: 0.44054818, a: 1}
-    - _Near_Far_Range: {r: 5, g: 20, b: 0, a: 0}
-    - _Wind_Noise_Contrast: {r: 0, g: 40, b: 0, a: 0}
-    - _Wind_Noise_Scale: {r: 20, g: 40, b: 0, a: 0}
+    - _Near_Colour: {r: 0, g: 0.02763319, b: 1, a: 1}
+    - _Near_Far_Range: {r: 6, g: 15, b: 0, a: 0}
+    - _Wind_Noise_Contrast: {r: 0, g: 0, b: 0, a: 0}
+    - _Wind_Noise_Scale: {r: 0, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3671897896050888323
