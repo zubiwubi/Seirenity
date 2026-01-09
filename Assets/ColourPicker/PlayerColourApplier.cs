@@ -18,10 +18,12 @@ public class TestColourNow : MonoBehaviour
 public class PlayerColourApplier : MonoBehaviour
 {
     private Renderer _renderer;
+    private TrailRenderer _trailRenderer;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
+        _trailRenderer = GetComponentInChildren<TrailRenderer>();
         if (_renderer == null)
         {
             Debug.LogError("[PlayerColourApplier] No Renderer found on this GameObject!");
@@ -44,6 +46,7 @@ public class PlayerColourApplier : MonoBehaviour
     {
         if (_renderer == null) return;                 // safety
         _renderer.material.SetColor("_BaseColor", c);   // URP Lit uses _BaseColor
+        _trailRenderer?.material.SetColor("_BaseColor", c);
     }
 
     /// <summary>

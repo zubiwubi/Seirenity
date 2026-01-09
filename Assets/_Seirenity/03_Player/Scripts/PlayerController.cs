@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Camera")]
     [SerializeField] private Transform cameraTransform;
-    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 2.5f, -6f);
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 2.5f, -6f); 
     [SerializeField] private float cameraSmoothTime = 0.3f;
     [SerializeField] private bool cameraLookAtPlayer = true;
     [SerializeField] private float cameraRotationSmoothTime = 0.6f;
@@ -49,9 +49,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 _playerVelocity;
     private bool _isHoming = false;
     private float _homingTimer = 0f;
+    
+    private bool _isStopping = false;
+    private float _stopRampTimer = 0f;
+    
+    private PlayerLife _playerLife;
+
     [Header("Debug")]
     [SerializeField] private bool debugHoming = false;
-    [Tooltip("If the nearest spline point is farther than this, snap to it immediately to avoid a large jump (meters). Set to 0 to always homing")]
     [SerializeField] private float snapThreshold = 0f;
 
     private void SetupInput()
@@ -65,6 +70,14 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         SetupInput();
+
+        // subscribe to PlayerLife death to request early stop
+        _playerLife = GetComponentInParent<PlayerLife>();
+        if (_playerLife != null)
+        {
+            _playerLife.onDeath += OnPlayerLifeDeath;
+        }
+
         // initialize _t to nearest spline parameter so player faces forward while idle
         if (splineContainer != null && splineContainer.Spline != null)
         {
@@ -93,10 +106,72 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (_playerLife != null) _playerLife.onDeath -= OnPlayerLifeDeath;
+
+        if (_inputSystemActions != null)
+        {
+            _inputSystemActions.Player.LaunchPlayer.performed -= OnLaunch;
+            _inputSystemActions.Player.Disable();
+            _inputSystemActions.Dispose();
+            _inputSystemActions = null;
+        }
+    }
+
     private void OnLaunch(InputAction.CallbackContext context)
     {
-        if (_cooldownTimer > 0f || _isLaunching) return;
+        
+        if (_cooldownTimer > 0f || _isLaunching || _isStopping) return;
+
+        
+        if (!CanLaunch())
+        {
+            if (debugHoming) Debug.Log("Launch blocked: no coloured origami available.");
+            return;
+        }
+
+        var parentLife = GetComponentInParent<PlayerLife>();
+        if (parentLife != null) parentLife.isTicking = true; // Very ugly but works for now
         BeginLaunch();
+    }
+    
+    private bool CanLaunch()
+    {
+        var applier = GetComponentInChildren<PlayerColourApplier>();
+        if (applier == null) return false;
+        if (!PlayerPrefs.HasKey("PlayerColour")) return false;
+        return true;
+    }
+
+    
+    private void OnPlayerLifeDeath()
+    {
+        // request a graceful stop of any homing/launch in progress
+        RequestStopLaunch();
+    }
+
+   
+    public void RequestStopLaunch()
+    {
+        if (_isStopping) return;
+        _isStopping = true;
+        _stopRampTimer = Mathf.Max(0f, launchRampDown);
+
+        
+        _isHoming = false;
+        _isLaunching = true;
+
+        
+        _launchTimer = Mathf.Max(_launchTimer, _stopRampTimer);
+
+       
+        _playerVelocity = Vector3.zero;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
     }
 
     private void FixedUpdate()
@@ -109,7 +184,7 @@ public class PlayerController : MonoBehaviour
 
         if (splineContainer == null || splineContainer.Spline == null) return;
 
-        // idle: not homing or launching -> keep facing forward along spline
+        // idle: not homing or launching 
         if (!_isLaunching && !_isHoming)
         {
             var splineIdle = splineContainer.Spline;
@@ -161,18 +236,30 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
+        // Launching (or stopping) behaviour
         float speed = launchSpeedNormalized;
         float elapsed = launchDuration - _launchTimer;
         float remaining = _launchTimer;
         float upFactor = (launchRampUp > 0f) ? Mathf.Lerp(minLaunchSpeedFactor, 1f, Mathf.Clamp01(elapsed / launchRampUp)) : 1f;
         float downFactor = (launchRampDown > 0f) ? Mathf.Lerp(minLaunchSpeedFactor, 1f, Mathf.Clamp01(remaining / launchRampDown)) : 1f;
-        float factor = Mathf.Min(upFactor, downFactor);
+
+        float factor;
+        if (_isStopping)
+        {
+            float stopRemaining = Mathf.Max(0f, _stopRampTimer);
+            float stopDownFactor = (launchRampDown > 0f) ? Mathf.Lerp(minLaunchSpeedFactor, 1f, Mathf.Clamp01(stopRemaining / launchRampDown)) : minLaunchSpeedFactor;
+            factor = Mathf.Min(upFactor, stopDownFactor);
+        }
+        else
+        {
+            factor = Mathf.Min(upFactor, downFactor);
+        }
+
         float deltaT = speed * factor * Time.fixedDeltaTime;
         float candidateT = _t - deltaT; // counter-clockwise
 
         var spline = splineContainer.Spline;
-
-        // advance parameter using candidateT then sample world position
+        
         float sampleTAdvance = candidateT;
         if (loop) sampleTAdvance = Mathf.Repeat(sampleTAdvance, 1f);
         else sampleTAdvance = Mathf.Clamp01(sampleTAdvance);
@@ -210,6 +297,18 @@ public class PlayerController : MonoBehaviour
         if (loop) _t = Mathf.Repeat(_t, 1f);
         else _t = Mathf.Clamp01(_t);
 
+        // decrement timers
+        if (_isStopping)
+        {
+            _stopRampTimer -= Time.fixedDeltaTime;
+            // when stop ramp completes, end the launch
+            if (_stopRampTimer <= 0f)
+            {
+                EndLaunch();
+                return;
+            }
+        }
+
         _launchTimer -= Time.fixedDeltaTime;
         if (_launchTimer <= 0f)
         {
@@ -222,7 +321,7 @@ public class PlayerController : MonoBehaviour
         if (splineContainer == null || splineContainer.Spline == null) return;
 
         var spline = splineContainer.Spline;
-        // use the rigidbody center if available (more accurate for physics-driven objects), otherwise transform.position
+        
         Vector3 referencePoint = rb != null ? rb.worldCenterOfMass : transform.position;
 
         // coarse sampling pass
@@ -295,6 +394,8 @@ public class PlayerController : MonoBehaviour
     private void EndLaunch()
     {
         _isLaunching = false;
+        _isStopping = false;
+        _stopRampTimer = 0f;
         _launchTimer = 0f;
         _cooldownTimer = launchCooldown;
         if (rb != null)
@@ -308,19 +409,29 @@ public class PlayerController : MonoBehaviour
     {
         if (cameraTransform != null)
         {
-            Vector3 desired = transform.position + cameraOffset;
+            Vector3 desired = transform.position + transform.rotation * cameraOffset;
+
+            // Smooth position
             cameraTransform.position = Vector3.SmoothDamp(cameraTransform.position, desired, ref _cameraVelocity, cameraSmoothTime);
+
+            // Smooth rotation
             if (cameraLookAtPlayer)
             {
-                Quaternion camDesired = Quaternion.LookRotation(transform.position - cameraTransform.position, Vector3.up);
+                Quaternion lookRot = Quaternion.LookRotation(transform.position - cameraTransform.position, Vector3.up);
+
+                // align yaw with player to keep camera positioned behind
+                Vector3 lookEuler = lookRot.eulerAngles;
+                float playerYaw = transform.eulerAngles.y;
+                Quaternion yawAligned = Quaternion.Euler(lookEuler.x, playerYaw, 0f);
+
                 float rotLerp = 1f - Mathf.Exp(-Time.deltaTime / Mathf.Max(0.0001f, cameraRotationSmoothTime));
-                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, camDesired, rotLerp);
+                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, yawAligned, rotLerp);
+            }
+            else
+            {
+                float rotLerp = 1f - Mathf.Exp(-Time.deltaTime / Mathf.Max(0.0001f, cameraRotationSmoothTime));
+                cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, transform.rotation, rotLerp);
             }
         }
-    }
-
-    public void LaunchFromLookDirection()
-    {
-        BeginLaunch();
     }
 }
