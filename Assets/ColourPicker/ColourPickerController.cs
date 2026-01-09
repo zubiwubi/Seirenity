@@ -52,7 +52,7 @@ public class ColourPickerController : MonoBehaviour,
         }
         if (playerApplier == null)
         {
-            Debug.LogError("[ColourPicker] playerApplier not assigned.");
+             Debug.LogError("[ColourPicker] playerApplier not assigned.");
             return;
         }
 
@@ -63,13 +63,7 @@ public class ColourPickerController : MonoBehaviour,
             Debug.LogError("[ColourPicker] Wheel texture is not a readable Texture2D. " +
                            "Enable 'Read/Write Enabled' on the PNG import settings.");
         }
-
-        // ----- Hook up the Confirm button -----
-        confirmButton.onClick.AddListener(() =>
-        {
-            playerApplier.ApplyColour();   // lock colour / optional save
-            HidePicker();
-        });
+        
     }
 
     // -----------------------------------------------------------------
@@ -77,12 +71,23 @@ public class ColourPickerController : MonoBehaviour,
     // -----------------------------------------------------------------
     public void ShowPicker()
     {
+        confirmButton.onClick.AddListener(() =>
+        {
+            playerApplier.ApplyColour();   // lock colour / optional save
+            HidePicker();
+        });
+        
         if (pickerRoot) pickerRoot.SetActive(true);
     }
 
     public void HidePicker()
     {
         if (pickerRoot) pickerRoot.SetActive(false);
+    }
+    
+    public void SetPlayerApplier(PlayerColourApplier applier)
+    {
+        playerApplier = applier;
     }
 
     // -----------------------------------------------------------------
