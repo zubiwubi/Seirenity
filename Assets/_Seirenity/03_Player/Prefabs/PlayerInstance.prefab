@@ -253,6 +253,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5444645236453978065}
     m_Modifications:
+    - target: {fileID: 2863654015393434307, guid: ced43ce216c64dc4da3c318aae669e2a, type: 3}
+      propertyPath: _trailRenderer
+      value: 
+      objectReference: {fileID: 5774419593193754329}
     - target: {fileID: 4072789326805533973, guid: ced43ce216c64dc4da3c318aae669e2a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.00022025843

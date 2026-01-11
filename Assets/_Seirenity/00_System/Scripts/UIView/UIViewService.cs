@@ -18,12 +18,12 @@ public class UIViewService : MonoBehaviour
 
 		private void SetupViewDictionary()
 		{
-			views = UnityEngine.Object.FindObjectsByType<UIView>(FindObjectsSortMode.None);
+			views = FindObjectsByType<UIView>(FindObjectsSortMode.None);
 			viewsDictionary.Clear();
 
 			bool defaultViewFound = false;
 
-			foreach (UIView view in views)
+			foreach (UIView view in views) 
 			{
 				view.Initialize();
 				view.Hide();

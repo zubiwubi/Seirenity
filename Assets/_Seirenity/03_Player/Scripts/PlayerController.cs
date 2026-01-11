@@ -54,10 +54,15 @@ public class PlayerController : MonoBehaviour
     private float _stopRampTimer = 0f;
     
     private PlayerLife _playerLife;
+    private ColourPickerController _colourPickerController;
 
     [Header("Debug")]
     [SerializeField] private bool debugHoming = false;
     [SerializeField] private float snapThreshold = 0f;
+    
+    private bool _hasLockedColour = false;
+
+    private float _nextLaunchAllowedAt = 0f;
 
     private void SetupInput()
     {
@@ -78,6 +83,14 @@ public class PlayerController : MonoBehaviour
             _playerLife.onDeath += OnPlayerLifeDeath;
         }
 
+        
+        _colourPickerController = FindAnyObjectByType<ColourPickerController>();
+        if (_colourPickerController == null)
+        {
+            
+            _colourPickerController = null;
+        }
+        
         // initialize _t to nearest spline parameter so player faces forward while idle
         if (splineContainer != null && splineContainer.Spline != null)
         {
@@ -122,12 +135,34 @@ public class PlayerController : MonoBehaviour
     private void OnLaunch(InputAction.CallbackContext context)
     {
         
-        if (_cooldownTimer > 0f || _isLaunching || _isStopping) return;
+        if (Time.time < _nextLaunchAllowedAt || _isLaunching || _isStopping)
+        {
+            if (debugHoming)
+            {
+                if (Time.time < _nextLaunchAllowedAt)
+                    Debug.Log($"Launch blocked: cooldown active for {(_nextLaunchAllowedAt - Time.time):F2}s");
+                else if (_isLaunching) Debug.Log("Launch blocked: already launching");
+                else Debug.Log("Launch blocked: stopping in progress");
+            }
+            return;
+        }
 
+        
+        if (_playerLife != null && _playerLife.IsSpawnPending)
+        {
+            if (debugHoming) Debug.Log("Launch blocked: player spawn pending");
+            return;
+        }
+        
+        if (_colourPickerController != null && _colourPickerController.IsOpen)
+        {
+            if (debugHoming) Debug.Log("Launch blocked: colour picker open");
+            return;
+        }
         
         if (!CanLaunch())
         {
-            if (debugHoming) Debug.Log("Launch blocked: no coloured origami available.");
+            if (debugHoming) Debug.Log("Launch blocked: CanLaunch() returned false");
             return;
         }
 
@@ -139,8 +174,24 @@ public class PlayerController : MonoBehaviour
     private bool CanLaunch()
     {
         var applier = GetComponentInChildren<PlayerColourApplier>();
-        if (applier == null) return false;
-        if (!PlayerPrefs.HasKey("PlayerColour")) return false;
+        if (applier != null && applier.IsColourLocked)
+        {
+            _hasLockedColour = true;
+        }
+
+        if (!(_hasLockedColour || (applier != null && applier.IsColourLocked)))
+        {
+            if (debugHoming) Debug.Log("CanLaunch: neither cached lock nor instance lock is present");
+            return false;
+        }
+
+        if (!PlayerPrefs.HasKey("PlayerColour"))
+        {
+            if (debugHoming) Debug.Log("CanLaunch: PlayerPrefs does not contain PlayerColour key");
+            return false;
+        }
+
+        if (debugHoming) Debug.Log("CanLaunch: OK (lock present)");
         return true;
     }
 
@@ -149,6 +200,8 @@ public class PlayerController : MonoBehaviour
     {
         // request a graceful stop of any homing/launch in progress
         RequestStopLaunch();
+        
+        _hasLockedColour = false;
     }
 
    
@@ -397,7 +450,8 @@ public class PlayerController : MonoBehaviour
         _isStopping = false;
         _stopRampTimer = 0f;
         _launchTimer = 0f;
-        _cooldownTimer = launchCooldown;
+        _cooldownTimer = launchCooldown; // keep the existing timer for compatibility
+        _nextLaunchAllowedAt = Time.time + launchCooldown; // robust timestamp-based cooldown
         if (rb != null)
         {
             rb.linearVelocity = Vector3.zero;

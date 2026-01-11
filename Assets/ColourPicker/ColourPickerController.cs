@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -50,11 +49,11 @@ public class ColourPickerController : MonoBehaviour,
             Debug.LogError("[ColourPicker] confirmButton not assigned.");
             return;
         }
-        if (playerApplier == null)
-        {
-             Debug.LogError("[ColourPicker] playerApplier not assigned.");
-            return;
-        }
+        // if (playerApplier == null)
+        // {
+        //      Debug.LogError("[ColourPicker] playerApplier not assigned.");
+        //     return;
+        // }
 
         // ----- Get the readable texture from the RawImage -----
         wheelTexture = colourWheelRawImage.texture as Texture2D;
@@ -71,9 +70,24 @@ public class ColourPickerController : MonoBehaviour,
     // -----------------------------------------------------------------
     public void ShowPicker()
     {
+        confirmButton.onClick.RemoveAllListeners();
         confirmButton.onClick.AddListener(() =>
         {
             playerApplier.ApplyColour();   // lock colour / optional save
+            HidePicker();
+        });
+        
+        if (pickerRoot) pickerRoot.SetActive(true);
+    }
+    
+    public void ShowPicker(PlayerColourApplier applier)
+    {
+        playerApplier = applier;
+        
+        confirmButton.onClick.RemoveAllListeners();
+        confirmButton.onClick.AddListener(() =>
+        {
+            playerApplier.ApplyColour();   
             HidePicker();
         });
         
@@ -85,6 +99,9 @@ public class ColourPickerController : MonoBehaviour,
         if (pickerRoot) pickerRoot.SetActive(false);
     }
     
+    
+    public bool IsOpen => pickerRoot != null && pickerRoot.activeSelf;
+     
     public void SetPlayerApplier(PlayerColourApplier applier)
     {
         playerApplier = applier;
@@ -136,6 +153,6 @@ public class ColourPickerController : MonoBehaviour,
         if (sampled.a < 0.1f) return;
 
         // Forward colour to the player for live preview
-        playerApplier?.SetPreviewColour(sampled);
+        playerApplier.SetPreviewColour(sampled);
     }
 }

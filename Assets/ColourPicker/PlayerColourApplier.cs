@@ -1,5 +1,4 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 public class TestColourNow : MonoBehaviour
 {
     void Start()
@@ -18,19 +17,23 @@ public class TestColourNow : MonoBehaviour
 public class PlayerColourApplier : MonoBehaviour
 {
     private Renderer _renderer;
+    
+    [SerializeField]
     private TrailRenderer _trailRenderer;
+    
+    private bool _isColourLocked;
+    public bool IsColourLocked => _isColourLocked;
 
     private void Awake()
     {
         _renderer = GetComponent<Renderer>();
-        _trailRenderer = GetComponentInChildren<TrailRenderer>();
+
         if (_renderer == null)
         {
             Debug.LogError("[PlayerColourApplier] No Renderer found on this GameObject!");
             return;
         }
-
-        // OPTIONAL: load a saved colour on start
+        
         if (PlayerPrefs.HasKey("PlayerColour"))
         {
             string savedHex = PlayerPrefs.GetString("PlayerColour");
@@ -64,6 +67,8 @@ public class PlayerColourApplier : MonoBehaviour
         string hex = $"#{ColorUtility.ToHtmlStringRGBA(finalCol)}";
         PlayerPrefs.SetString("PlayerColour", hex);
         PlayerPrefs.Save();
+        
+        _isColourLocked = true;
 
         Debug.Log($"[PlayerColourApplier] Colour locked: {hex}");
     }
