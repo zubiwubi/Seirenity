@@ -10,20 +10,13 @@ public class PlayerController : MonoBehaviour
     [Header("Spline")]
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private bool loop = true;
-    [Tooltip("Normalized units per second while launching [0..1]/s")]
     [Range(0f, 1f)]
     [SerializeField] private float launchSpeedNormalized = 0.05f;
-    [Tooltip("Smooth time for player movement to simulate floating")]
     [SerializeField] private float playerSmoothTime = 0.5f;
-    [Tooltip("Smooth time for player rotation")]
     [SerializeField] private float playerRotationSmoothTime = 0.6f;
-    [Tooltip("Time (s) to smoothly align the player to the nearest spline position before starting the launch")]
     [SerializeField] private float homingDuration = 0.25f;
-    [Tooltip("Time (s) to ramp up from slow to cruise speed at the start of a launch")]
     [SerializeField] private float launchRampUp = 3.0f;
-    [Tooltip("Time (s) to ramp down from cruise to slow at the end of a launch")]
     [SerializeField] private float launchRampDown = 3.0f;
-    [Tooltip("Minimum fraction of cruise speed at start/end of launch")]
     [Range(0f, 1f)]
     [SerializeField] private float minLaunchSpeedFactor = 0.02f;
 
@@ -60,6 +53,17 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private bool debugHoming = false;
     [SerializeField] private float snapThreshold = 0f;
     
+    
+    [Header("Spline Offset")]
+    [SerializeField] private bool enableSplineOffset = true;
+    [SerializeField] private float maxSplineOffset = 0.3f;
+    [SerializeField] private float noiseScale = 4f;
+    [SerializeField] private float noiseSpeed = 0.5f;
+    [SerializeField] private float offsetSmoothness = 8f;
+    [SerializeField] private int noiseSeed = 0;
+
+    private Vector3 _currentWorldOffset = Vector3.zero; // smoothed offset applied to desired position
+
     private bool _hasLockedColour = false;
 
     private float _nextLaunchAllowedAt = 0f;
@@ -75,7 +79,12 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         SetupInput();
-
+        
+        if (enableSplineOffset && noiseSeed == 0)
+        {
+            noiseSeed = UnityEngine.Random.Range(1, 100000);
+        }
+ 
         // subscribe to PlayerLife death to request early stop
         _playerLife = GetComponentInParent<PlayerLife>();
         if (_playerLife != null)
@@ -166,8 +175,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        var parentLife = GetComponentInParent<PlayerLife>();
-        if (parentLife != null) parentLife.isTicking = true; // Very ugly but works for now
         BeginLaunch();
     }
     
@@ -263,7 +270,11 @@ public class PlayerController : MonoBehaviour
             Vector3 worldPosH = splineContainer.transform.TransformPoint(new Vector3(pH.x, pH.y, pH.z));
             Vector3 worldTanH = splineContainer.transform.TransformDirection(new Vector3(tanH.x, tanH.y, tanH.z));
 
-            Vector3 smoothedPosH = Vector3.SmoothDamp(rb != null ? rb.position : transform.position, worldPosH, ref _playerVelocity, playerSmoothTime, float.MaxValue, Time.fixedDeltaTime);
+            
+            Vector3 worldOffsetH = ComputeSplineOffset(sampleTH, worldTanH);
+            Vector3 targetWorldPosH = worldPosH + worldOffsetH;
+
+            Vector3 smoothedPosH = Vector3.SmoothDamp(rb != null ? rb.position : transform.position, targetWorldPosH, ref _playerVelocity, playerSmoothTime, float.MaxValue, Time.fixedDeltaTime);
             Quaternion desiredRotH = worldTanH.sqrMagnitude > 0.0001f ? Quaternion.LookRotation((-worldTanH).normalized, Vector3.up) : transform.rotation;
             if (rb != null)
             {
@@ -324,11 +335,13 @@ public class PlayerController : MonoBehaviour
 
         Vector3 worldPos = splineContainer.transform.TransformPoint(localPos);
         Vector3 worldTan = splineContainer.transform.TransformDirection(localTan);
-
-        // smooth movement to simulate floating
-        Vector3 desiredPos = worldPos;
+        
+        
+        Vector3 worldOffset = ComputeSplineOffset(sampleTAdvance, worldTan);
+        
+        Vector3 desiredPos = worldPos + worldOffset;
         Vector3 smoothedPos = Vector3.SmoothDamp(rb != null ? rb.position : transform.position, desiredPos, ref _playerVelocity, playerSmoothTime, float.MaxValue, Time.fixedDeltaTime);
-
+ 
         Quaternion desiredRot = Quaternion.identity;
         if (worldTan.sqrMagnitude > 0.0001f) desiredRot = Quaternion.LookRotation((-worldTan).normalized, Vector3.up);
 
@@ -344,8 +357,7 @@ public class PlayerController : MonoBehaviour
             float rotLerp = 1f - Mathf.Exp(-Time.fixedDeltaTime / Mathf.Max(0.0001f, playerRotationSmoothTime));
             transform.rotation = Quaternion.Slerp(transform.rotation, desiredRot, rotLerp);
         }
-
-        // commit the parameter advance after sampling so internal _t stays in sync
+        
         _t = candidateT;
         if (loop) _t = Mathf.Repeat(_t, 1f);
         else _t = Mathf.Clamp01(_t);
@@ -487,5 +499,48 @@ public class PlayerController : MonoBehaviour
                 cameraTransform.rotation = Quaternion.Slerp(cameraTransform.rotation, transform.rotation, rotLerp);
             }
         }
+    }
+
+    private Vector3 ComputeSplineOffset(float sampleT, Vector3 worldTan)
+    {
+        if (!enableSplineOffset || worldTan.sqrMagnitude <= 0.0001f) return Vector3.zero;
+
+        Vector3 sideWorld = Vector3.Cross(worldTan, Vector3.up);
+        if (sideWorld.sqrMagnitude < 1e-6f)
+            sideWorld = Vector3.Cross(worldTan, Vector3.forward);
+        sideWorld.Normalize();
+
+        float tNoise = sampleT * noiseScale;
+        float timeNoise = Time.time * noiseSpeed;
+        float seedOffset = noiseSeed * 0.001f;
+        float n1 = Mathf.PerlinNoise(tNoise + seedOffset, timeNoise);
+
+        float lateral = (n1 * 2f - 1f) * maxSplineOffset; // [-max, max]
+
+        Vector3 targetOffset = sideWorld * lateral;
+
+        float k = 1f - Mathf.Exp(-Mathf.Max(0f, offsetSmoothness) * Time.fixedDeltaTime);
+        _currentWorldOffset = Vector3.Lerp(_currentWorldOffset, targetOffset, k);
+        return _currentWorldOffset;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (!debugHoming || splineContainer == null || splineContainer.Spline == null) return;
+
+        var spline = splineContainer.Spline;
+        float sampleT = loop ? Mathf.Repeat(_t, 1f) : Mathf.Clamp01(_t);
+        float3 p = spline.EvaluatePosition(sampleT);
+        float3 tan = spline.EvaluateTangent(sampleT);
+        Vector3 worldPos = splineContainer.transform.TransformPoint(new Vector3(p.x, p.y, p.z));
+        Vector3 worldTan = splineContainer.transform.TransformDirection(new Vector3(tan.x, tan.y, tan.z));
+        Vector3 offset = ComputeSplineOffset(sampleT, worldTan);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawSphere(worldPos, 0.05f);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawSphere(worldPos + offset, 0.06f);
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(worldPos, worldPos + offset);
     }
 }

@@ -70,12 +70,7 @@ public class ColourPickerController : MonoBehaviour,
     // -----------------------------------------------------------------
     public void ShowPicker()
     {
-        confirmButton.onClick.RemoveAllListeners();
-        confirmButton.onClick.AddListener(() =>
-        {
-            playerApplier.ApplyColour();   // lock colour / optional save
-            HidePicker();
-        });
+        SetConfirmListener();
         
         if (pickerRoot) pickerRoot.SetActive(true);
     }
@@ -83,15 +78,29 @@ public class ColourPickerController : MonoBehaviour,
     public void ShowPicker(PlayerColourApplier applier)
     {
         playerApplier = applier;
+        SetConfirmListener();
         
+        if (pickerRoot) pickerRoot.SetActive(true);
+    }
+
+    private void SetConfirmListener()
+    {
         confirmButton.onClick.RemoveAllListeners();
         confirmButton.onClick.AddListener(() =>
         {
-            playerApplier.ApplyColour();   
+            if (playerApplier != null)
+            {
+                playerApplier.ApplyColour();   
+            }
+            
+            var playerLife = FindAnyObjectByType<PlayerLife>();
+            if (playerLife != null)
+            {
+                playerLife.OnPlayerColorConfirmed();
+            }
+
             HidePicker();
         });
-        
-        if (pickerRoot) pickerRoot.SetActive(true);
     }
 
     public void HidePicker()

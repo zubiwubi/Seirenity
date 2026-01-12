@@ -9,7 +9,7 @@ public class PlayerLife : MonoBehaviour
 
     public GameObject playerPrefab;
     public GameObject trailCollectorObject;
-    
+
     private GameObject playerInstance;
     private ColourPickerController colourPickerController;
     
@@ -18,7 +18,7 @@ public class PlayerLife : MonoBehaviour
     [SerializeField]
     private float lifeTime = 10f;
     private float _currentLife;
-    
+
     [HideInInspector]
     public bool isTicking = false;
 
@@ -33,8 +33,7 @@ public class PlayerLife : MonoBehaviour
     [Tooltip("Seconds to wait after spawning before opening the color picker")]
     [SerializeField]
     private float colorPickerDelay = 0.5f;
-
-    // Track whether the game has begun (so Start doesn't auto spawn)
+    
     private bool hasGameBegun = false;
 
     public void ResetLife()
@@ -51,20 +50,27 @@ public class PlayerLife : MonoBehaviour
         }
         
         colourPickerController = FindAnyObjectByType<ColourPickerController>();
-        colourPickerController.HidePicker();
-        
+        if (colourPickerController == null)
+        {
+            var all = Resources.FindObjectsOfTypeAll<ColourPickerController>();
+            if (all != null && all.Length > 0) colourPickerController = all[0];
+        }
+
+        if (colourPickerController != null)
+            colourPickerController.HidePicker();
+
     }
-    
+
     public void BeginGame()
     {
         if (hasGameBegun) return;
         hasGameBegun = true;
 
-        
+
         IsSpawnPending = true;
         spawnCoroutine = StartCoroutine(SpawnSequenceCoroutine());
     }
-    
+
     public void CancelInitialSpawn()
     {
         if (spawnCoroutine != null)
@@ -118,17 +124,13 @@ public class PlayerLife : MonoBehaviour
 
     private IEnumerator DeathSequenceCoroutine()
     {
-        // play death animation (no null checks per earlier behavior)
         playerInstance.GetComponentInChildren<Animator>().Play("PlayerDeath");
         
-        // move the trail to the collector object so it doesn't get destroyed with the player
         playerInstance.GetComponentInChildren<TrailRenderer>().gameObject.transform.SetParent(trailCollectorObject.transform);
-
-        // wait for the configured delay
+        
         IsSpawnPending = true;
         yield return new WaitForSeconds(respawnDelay);
-
-        // remove old instance and start spawn coroutine for fresh one
+        
         Destroy(playerInstance);
         playerInstance = null;
 
@@ -139,31 +141,40 @@ public class PlayerLife : MonoBehaviour
 
     private IEnumerator SpawnSequenceCoroutine()
     {
-        // wait before spawning
         if (spawnDelay > 0f) yield return new WaitForSeconds(spawnDelay);
 
         playerInstance = SpawnNewPlayer();
         
-        IsSpawnPending = false;
-
-        // reset life for the new instance
         ResetLife();
 
-        // enable life ticking now that the player exists
-        isTicking = true;
-
-        // after spawn, wait then show/rehook color picker
+        IsSpawnPending = false;
+        
         if (colorPickerDelay > 0f) yield return new WaitForSeconds(colorPickerDelay);
 
         PlayerColourApplier applier = null;
         if (playerInstance != null)
             applier = playerInstance.GetComponentInChildren<PlayerColourApplier>();
-        
+
         if (colourPickerController != null && applier != null)
         {
             colourPickerController.ShowPicker(applier);
         }
+        else
+        {
+            StartLifeTicking();
+        }
 
         spawnCoroutine = null;
+    }
+    
+    public void StartLifeTicking()
+    {
+        ResetLife();
+        isTicking = true;
+    }
+    
+    public void OnPlayerColorConfirmed()
+    {
+        StartLifeTicking();
     }
 }
