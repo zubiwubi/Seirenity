@@ -121138,7 +121138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc796a310abb3541875d431888bee9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ambienceBgm: {fileID: 8300000, guid: 5c6022c5302e0584b9b8f9c08722882f, type: 3}
+  ambienceBgm: {fileID: 8300000, guid: eba401c4b998e884ab5b431feb9898c0, type: 3}
 --- !u!82 &5692992025162902080
 AudioSource:
   m_ObjectHideFlags: 0
@@ -121149,8 +121149,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 5c6022c5302e0584b9b8f9c08722882f, type: 3}
-  m_Resource: {fileID: 8300000, guid: 5c6022c5302e0584b9b8f9c08722882f, type: 3}
+  m_audioClip: {fileID: 8300000, guid: eba401c4b998e884ab5b431feb9898c0, type: 3}
+  m_Resource: {fileID: 8300000, guid: eba401c4b998e884ab5b431feb9898c0, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
