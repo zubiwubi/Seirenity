@@ -60,7 +60,7 @@ Material:
     - _Bottom_Colour: {r: 0.6052052, g: 0.6289307, b: 0.3658873, a: 0}
     - _Colour: {r: 0, g: 0, b: 0, a: 0}
     - _Far_Colour: {r: 0, g: 0, b: 0, a: 1}
-    - _Near_Colour: {r: 0.6226415, g: 0.5641115, b: 0.44054818, a: 1}
+    - _Near_Colour: {r: 0.4490565, g: 0.398793, b: 0.32789597, a: 1}
     - _Near_Far_Range: {r: 5, g: 20, b: 0, a: 0}
     - _Wind_Noise_Contrast: {r: 0, g: 40, b: 0, a: 0}
     - _Wind_Noise_Scale: {r: 20, g: 40, b: 0, a: 0}
