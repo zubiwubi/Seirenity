@@ -62,7 +62,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float offsetSmoothness = 8f;
     [SerializeField] private int noiseSeed = 0;
 
-    private Vector3 _currentWorldOffset = Vector3.zero; // smoothed offset applied to desired position
+    private Vector3 _currentWorldOffset = Vector3.zero;
 
     private bool _hasLockedColour = false;
 
@@ -100,7 +100,6 @@ public class PlayerController : MonoBehaviour
             _colourPickerController = null;
         }
         
-        // initialize _t to nearest spline parameter so player faces forward while idle
         if (splineContainer != null && splineContainer.Spline != null)
         {
             var spline = splineContainer.Spline;
@@ -117,16 +116,13 @@ public class PlayerController : MonoBehaviour
                 if (d < bestSqr) { bestSqr = d; bestT = tt; }
             }
             _t = bestT;
-            // face forward along spline
+            
             float sampleT = loop ? Mathf.Repeat(_t, 1f) : Mathf.Clamp01(_t);
             float3 tTan = spline.EvaluateTangent(sampleT);
             Vector3 worldTan = splineContainer.transform.TransformDirection(new Vector3(tTan.x, tTan.y, tTan.z));
-            if (worldTan.sqrMagnitude > 0.0001f)
-            {
-                transform.rotation = Quaternion.LookRotation((-worldTan).normalized, Vector3.up);
-            }
-        }
-    }
+            if (worldTan.sqrMagnitude > 0.0001f) transform.rotation = ForwardLookRotation(worldTan);
+         }
+     }
 
     private void OnDestroy()
     {
@@ -253,7 +249,7 @@ public class PlayerController : MonoBehaviour
             Vector3 worldTanIdle = splineContainer.transform.TransformDirection(new Vector3(tanIdle.x, tanIdle.y, tanIdle.z));
             if (worldTanIdle.sqrMagnitude > 0.0001f)
             {
-                Quaternion desiredRotIdle = Quaternion.LookRotation((-worldTanIdle).normalized, Vector3.up);
+                Quaternion desiredRotIdle = ForwardLookRotation(worldTanIdle);
                 float rotLerp = 1f - Mathf.Exp(-Time.fixedDeltaTime / Mathf.Max(0.0001f, playerRotationSmoothTime));
                 if (rb != null) rb.MoveRotation(Quaternion.Slerp(rb.rotation, desiredRotIdle, rotLerp));
                 else transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotIdle, rotLerp);
@@ -275,7 +271,7 @@ public class PlayerController : MonoBehaviour
             Vector3 targetWorldPosH = worldPosH + worldOffsetH;
 
             Vector3 smoothedPosH = Vector3.SmoothDamp(rb != null ? rb.position : transform.position, targetWorldPosH, ref _playerVelocity, playerSmoothTime, float.MaxValue, Time.fixedDeltaTime);
-            Quaternion desiredRotH = worldTanH.sqrMagnitude > 0.0001f ? Quaternion.LookRotation((-worldTanH).normalized, Vector3.up) : transform.rotation;
+            Quaternion desiredRotH = ForwardLookRotation(worldTanH);
             if (rb != null)
             {
                 rb.MovePosition(smoothedPosH);
@@ -289,16 +285,16 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotH, rotLerp);
             }
 
-            _homingTimer -= Time.fixedDeltaTime;
-            if (_homingTimer <= 0f)
-            {
-                _isHoming = false;
-                _isLaunching = true;
-                _launchTimer = launchDuration;
-            }
+             _homingTimer -= Time.fixedDeltaTime;
+             if (_homingTimer <= 0f)
+             {
+                 _isHoming = false;
+                 _isLaunching = true;
+                 _launchTimer = launchDuration;
+             }
 
-            return;
-        }
+             return;
+         }
 
         // Launching (or stopping) behaviour
         float speed = launchSpeedNormalized;
@@ -336,14 +332,12 @@ public class PlayerController : MonoBehaviour
         Vector3 worldPos = splineContainer.transform.TransformPoint(localPos);
         Vector3 worldTan = splineContainer.transform.TransformDirection(localTan);
         
-        
         Vector3 worldOffset = ComputeSplineOffset(sampleTAdvance, worldTan);
         
         Vector3 desiredPos = worldPos + worldOffset;
         Vector3 smoothedPos = Vector3.SmoothDamp(rb != null ? rb.position : transform.position, desiredPos, ref _playerVelocity, playerSmoothTime, float.MaxValue, Time.fixedDeltaTime);
  
-        Quaternion desiredRot = Quaternion.identity;
-        if (worldTan.sqrMagnitude > 0.0001f) desiredRot = Quaternion.LookRotation((-worldTan).normalized, Vector3.up);
+        Quaternion desiredRot = ForwardLookRotation(worldTan);
 
         if (rb != null)
         {
@@ -386,7 +380,7 @@ public class PlayerController : MonoBehaviour
         if (splineContainer == null || splineContainer.Spline == null) return;
 
         var spline = splineContainer.Spline;
-        
+
         Vector3 referencePoint = rb != null ? rb.worldCenterOfMass : transform.position;
 
         // coarse sampling pass
@@ -407,7 +401,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // local ternary refinement around bestT
-        float radius = 1f / samples * 4f; // search a few samples either side
+        float radius = 1f / samples * 4f;
         float lo = Mathf.Max(0f, bestT - radius);
         float hi = Mathf.Min(1f, bestT + radius);
         for (int it = 0; it < 16; it++)
@@ -430,46 +424,45 @@ public class PlayerController : MonoBehaviour
         float dist = Vector3.Distance(referencePoint, worldRefined);
         if (snapThreshold > 0f && dist > snapThreshold)
         {
-            // snap immediately to avoid a large jump later
             if (rb != null) rb.MovePosition(worldRefined);
             else transform.position = worldRefined;
-            _playerVelocity = Vector3.zero;
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
-            _isHoming = false;
-            _isLaunching = true;
-            _launchTimer = launchDuration;
-        }
-        else
-        {
-            _homingTimer = homingDuration;
-            _isHoming = true;
-            _playerVelocity = Vector3.zero;
-            if (rb != null)
-            {
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
-        }
-    }
+             _playerVelocity = Vector3.zero;
+             if (rb != null)
+             {
+                 rb.linearVelocity = Vector3.zero;
+                 rb.angularVelocity = Vector3.zero;
+             }
+             _isHoming = false;
+             _isLaunching = true;
+             _launchTimer = launchDuration;
+         }
+         else
+         {
+             _homingTimer = homingDuration;
+             _isHoming = true;
+             _playerVelocity = Vector3.zero;
+             if (rb != null)
+             {
+                 rb.linearVelocity = Vector3.zero;
+                 rb.angularVelocity = Vector3.zero;
+             }
+         }
+     }
 
-    private void EndLaunch()
-    {
-        _isLaunching = false;
-        _isStopping = false;
-        _stopRampTimer = 0f;
-        _launchTimer = 0f;
-        _cooldownTimer = launchCooldown; // keep the existing timer for compatibility
-        _nextLaunchAllowedAt = Time.time + launchCooldown; // robust timestamp-based cooldown
-        if (rb != null)
-        {
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-        }
-    }
+     private void EndLaunch()
+     {
+         _isLaunching = false;
+         _isStopping = false;
+         _stopRampTimer = 0f;
+         _launchTimer = 0f;
+         _cooldownTimer = launchCooldown; // keep the existing timer for compatibility
+         _nextLaunchAllowedAt = Time.time + launchCooldown; // robust timestamp-based cooldown
+         if (rb != null)
+         {
+             rb.linearVelocity = Vector3.zero;
+             rb.angularVelocity = Vector3.zero;
+         }
+     }
 
     private void LateUpdate()
     {
@@ -515,7 +508,7 @@ public class PlayerController : MonoBehaviour
         float seedOffset = noiseSeed * 0.001f;
         float n1 = Mathf.PerlinNoise(tNoise + seedOffset, timeNoise);
 
-        float lateral = (n1 * 2f - 1f) * maxSplineOffset; // [-max, max]
+        float lateral = (n1 * 2f - 1f) * maxSplineOffset;
 
         Vector3 targetOffset = sideWorld * lateral;
 
@@ -523,10 +516,10 @@ public class PlayerController : MonoBehaviour
         _currentWorldOffset = Vector3.Lerp(_currentWorldOffset, targetOffset, k);
         return _currentWorldOffset;
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        if (!debugHoming || splineContainer == null || splineContainer.Spline == null) return;
+ 
+     private void OnDrawGizmosSelected()
+     {
+         if (!debugHoming || splineContainer == null || splineContainer.Spline == null) return;
 
         var spline = splineContainer.Spline;
         float sampleT = loop ? Mathf.Repeat(_t, 1f) : Mathf.Clamp01(_t);
@@ -536,11 +529,38 @@ public class PlayerController : MonoBehaviour
         Vector3 worldTan = splineContainer.transform.TransformDirection(new Vector3(tan.x, tan.y, tan.z));
         Vector3 offset = ComputeSplineOffset(sampleT, worldTan);
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawSphere(worldPos, 0.05f);
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawSphere(worldPos + offset, 0.06f);
-        Gizmos.color = Color.green;
-        Gizmos.DrawLine(worldPos, worldPos + offset);
+        Gizmos.color = Color.yellow; Gizmos.DrawSphere(worldPos, 0.05f);
+        Gizmos.color = Color.cyan; Gizmos.DrawSphere(worldPos + offset, 0.06f);
+        Gizmos.color = Color.green; Gizmos.DrawLine(worldPos, worldPos + offset);
+     }
+
+    private Quaternion ForwardLookRotation(Vector3 worldTan)
+    {
+        Vector3 f = new Vector3(-worldTan.x, 0f, -worldTan.z);
+        if (f.sqrMagnitude < 1e-6f) f = Vector3.forward;
+        float yaw = Mathf.Atan2(f.x, f.z) * Mathf.Rad2Deg;
+        return Quaternion.Euler(0f, yaw, 0f);
     }
+
+    public void DisableInput()
+    {
+        if (_inputSystemActions != null)
+        {
+            _inputSystemActions.Player.LaunchPlayer.performed -= OnLaunch;
+            _inputSystemActions.Player.Disable();
+        }
+    }
+
+    public void EnableInput()
+    {
+        if (_inputSystemActions == null)
+        {
+            SetupInput();
+            return;
+        }
+        _inputSystemActions.Player.LaunchPlayer.performed -= OnLaunch;
+        _inputSystemActions.Player.LaunchPlayer.performed += OnLaunch;
+        _inputSystemActions.Player.Enable();
+    }
+
 }

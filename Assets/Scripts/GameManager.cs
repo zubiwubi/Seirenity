@@ -31,10 +31,14 @@ public class GameManager : MonoBehaviour
 
     private void SetupInput()
     {
-        _inputSystemActions = new InputSystem_Actions();
-        _inputSystemActions.Player.Enable();
-        
+        if (_inputSystemActions == null)
+            _inputSystemActions = new InputSystem_Actions();
+
+        // ensure no duplicate subscriptions
+        _inputSystemActions.Player.StartGame.performed -= OnStartGame;
         _inputSystemActions.Player.StartGame.performed += OnStartGame;
+
+        _inputSystemActions.Player.Enable();
     }
 
     private void OnDisable()
@@ -48,6 +52,7 @@ public class GameManager : MonoBehaviour
         {
             _inputSystemActions.Player.StartGame.performed -= OnStartGame;
             _inputSystemActions.Player.Disable();
+            // do not dispose here; keep instance for re-enable
         }
     }
 
@@ -99,5 +104,37 @@ public class GameManager : MonoBehaviour
             }
             DisableInput();
         });
+    }
+    
+    public void EnterOverviewMode()
+    {
+        if (overviewCamera != null) overviewCamera.gameObject.SetActive(true);
+        if (gameplayCamera != null) gameplayCamera.gameObject.SetActive(false);
+
+        if (playerLife != null)
+        {
+            playerLife.BlockSpawning = true;
+            playerLife.CancelInitialSpawn();
+            playerLife.isTicking = false;
+
+            var inst = playerLife.CurrentPlayerInstance;
+            if (inst != null)
+            {
+                var pc = inst.GetComponentInChildren<PlayerController>();
+                if (pc != null) pc.DisableInput();
+            }
+        }
+        
+        SetupInput();
+    }
+    
+    public void ReturnToGameMode()
+    {
+        if (playerLife != null)
+        {
+            playerLife.BlockSpawning = false;
+        }
+
+        StartGame();
     }
 }

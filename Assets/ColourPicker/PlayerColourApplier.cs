@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 public class TestColourNow : MonoBehaviour
 {
     void Start()
@@ -50,6 +51,16 @@ public class PlayerColourApplier : MonoBehaviour
         if (_renderer == null) return;                 // safety
         _renderer.material.SetColor("_BaseColor", c);   // URP Lit uses _BaseColor
         _trailRenderer?.material.SetColor("_BaseColor", c);
+        
+        // Set all the materials on objects tagged as PlayerColourTarget
+        GameObject.FindGameObjectsWithTag("PlayerColourTarget").ToList().ForEach(obj =>
+        {
+            Renderer renderer = obj.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.material.SetColor("_BaseColor", c);
+            }
+        });
     }
 
     /// <summary>

@@ -36,6 +36,9 @@ public class PlayerLife : MonoBehaviour
     
     private bool hasGameBegun = false;
 
+    public bool BlockSpawning { get; set; } = false;
+    public GameObject CurrentPlayerInstance => playerInstance;
+
     public void ResetLife()
     {
         _currentLife = lifeTime;
@@ -142,6 +145,13 @@ public class PlayerLife : MonoBehaviour
     private IEnumerator SpawnSequenceCoroutine()
     {
         if (spawnDelay > 0f) yield return new WaitForSeconds(spawnDelay);
+
+        // wait while spawning is blocked (overview mode)
+        while (BlockSpawning)
+        {
+            IsSpawnPending = true;
+            yield return null;
+        }
 
         playerInstance = SpawnNewPlayer();
         
