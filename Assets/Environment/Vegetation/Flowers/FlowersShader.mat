@@ -57,7 +57,7 @@ Material:
     - _Wind_Noise_Speed: 0
     - _Wind_Speed: 0
     m_Colors:
-    - _Bottom_Colour: {r: 0.6052052, g: 0.6289307, b: 0.3658873, a: 0}
+    - _Bottom_Colour: {r: 1, g: 1, b: 1, a: 0}
     - _Colour: {r: 0, g: 0, b: 0, a: 0}
     - _Far_Colour: {r: 0, g: 0, b: 0, a: 1}
     - _Near_Colour: {r: 1, g: 1, b: 1, a: 1}
