@@ -6,7 +6,10 @@ using Unity.Mathematics;
 public class PlayerController : MonoBehaviour
 {
     private InputSystem_Actions _inputSystemActions;
-
+    
+    [Header("Very important particle reference")]
+    [SerializeField] private ParticleSystem launchParticles;
+    
     [Header("Spline")]
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private bool loop = true;
@@ -378,7 +381,12 @@ public class PlayerController : MonoBehaviour
     private void BeginLaunch()
     {
         if (splineContainer == null || splineContainer.Spline == null) return;
-
+        
+        if (launchParticles != null)
+        {
+            launchParticles.Play();
+        }
+        
         var spline = splineContainer.Spline;
 
         Vector3 referencePoint = rb != null ? rb.worldCenterOfMass : transform.position;
