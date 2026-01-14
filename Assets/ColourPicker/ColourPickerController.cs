@@ -70,6 +70,9 @@ public class ColourPickerController : MonoBehaviour,
     // -----------------------------------------------------------------
     public void ShowPicker()
     {
+        var gm = FindAnyObjectByType<GameManager>();
+        if (gm != null && gm.IsOverviewMode) return;
+
         SetConfirmListener();
         
         if (pickerRoot) pickerRoot.SetActive(true);
@@ -77,6 +80,9 @@ public class ColourPickerController : MonoBehaviour,
     
     public void ShowPicker(PlayerColourApplier applier)
     {
+        var gm = FindAnyObjectByType<GameManager>();
+        if (gm != null && gm.IsOverviewMode) return;
+
         playerApplier = applier;
         SetConfirmListener();
         

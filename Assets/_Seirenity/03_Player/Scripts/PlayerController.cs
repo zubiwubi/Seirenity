@@ -71,6 +71,8 @@ public class PlayerController : MonoBehaviour
 
     private float _nextLaunchAllowedAt = 0f;
 
+    private float _enableIgnoreUntil = 0f; 
+
     private void SetupInput()
     {
         _inputSystemActions = new InputSystem_Actions();
@@ -142,7 +144,15 @@ public class PlayerController : MonoBehaviour
 
     private void OnLaunch(InputAction.CallbackContext context)
     {
+        if (Time.time < _enableIgnoreUntil) return;
         
+        var gm = FindAnyObjectByType<GameManager>();
+        if (gm != null)
+        {
+            if (gm.IsOverviewMode) return;
+            if (gm.IsInputIgnored) return;
+        }
+
         if (Time.time < _nextLaunchAllowedAt || _isLaunching || _isStopping)
         {
             if (debugHoming)
@@ -155,7 +165,6 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        
         if (_playerLife != null && _playerLife.IsSpawnPending)
         {
             if (debugHoming) Debug.Log("Launch blocked: player spawn pending");
@@ -176,7 +185,7 @@ public class PlayerController : MonoBehaviour
 
         BeginLaunch();
     }
-    
+
     private bool CanLaunch()
     {
         var applier = GetComponentInChildren<PlayerColourApplier>();
@@ -204,7 +213,6 @@ public class PlayerController : MonoBehaviour
     
     private void OnPlayerLifeDeath()
     {
-        // request a graceful stop of any homing/launch in progress
         RequestStopLaunch();
         
         _hasLockedColour = false;
@@ -564,11 +572,14 @@ public class PlayerController : MonoBehaviour
         if (_inputSystemActions == null)
         {
             SetupInput();
+            _enableIgnoreUntil = Time.time + 0.15f;
             return;
         }
         _inputSystemActions.Player.LaunchPlayer.performed -= OnLaunch;
         _inputSystemActions.Player.LaunchPlayer.performed += OnLaunch;
         _inputSystemActions.Player.Enable();
+        
+        _enableIgnoreUntil = Time.time + 0.15f;
     }
 
 }

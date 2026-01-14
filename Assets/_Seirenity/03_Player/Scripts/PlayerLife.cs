@@ -66,12 +66,21 @@ public class PlayerLife : MonoBehaviour
 
     public void BeginGame()
     {
-        if (hasGameBegun) return;
-        hasGameBegun = true;
+        if (!hasGameBegun)
+        {
+            hasGameBegun = true;
+
+            IsSpawnPending = true;
+            spawnCoroutine = StartCoroutine(SpawnSequenceCoroutine());
+            return;
+        }
 
 
-        IsSpawnPending = true;
-        spawnCoroutine = StartCoroutine(SpawnSequenceCoroutine());
+        if (playerInstance == null && !BlockSpawning && spawnCoroutine == null)
+        {
+            IsSpawnPending = true;
+            spawnCoroutine = StartCoroutine(SpawnSequenceCoroutine());
+        }
     }
 
     public void CancelInitialSpawn()
@@ -185,6 +194,13 @@ public class PlayerLife : MonoBehaviour
     
     public void OnPlayerColorConfirmed()
     {
+        // When player confirms their color, enable player input if a controller exists
+        if (playerInstance != null)
+        {
+            var pc = playerInstance.GetComponentInChildren<PlayerController>();
+            if (pc != null) pc.EnableInput();
+        }
+
         StartLifeTicking();
     }
 }
