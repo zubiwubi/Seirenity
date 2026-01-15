@@ -5,10 +5,15 @@ using UnityEngine;
 
 public class PlayerLife : MonoBehaviour
 {
+    public static PlayerLife Instance; 
+
     public Action onDeath;
 
     public GameObject playerPrefab;
     public GameObject trailCollectorObject;
+
+    [HideInInspector]
+    public int currentPlayerIncrement = 0;
 
     private GameObject playerInstance;
     private ColourPickerController colourPickerController;
@@ -46,6 +51,8 @@ public class PlayerLife : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
+
         if (playerPrefab == null)
         {
             Debug.LogError("PlayerLife: playerPrefab is not assigned.");
@@ -59,8 +66,8 @@ public class PlayerLife : MonoBehaviour
             if (all != null && all.Length > 0) colourPickerController = all[0];
         }
 
-        if (colourPickerController != null)
-            colourPickerController.HidePicker();
+
+        colourPickerController.HidePicker();
 
     }
 
@@ -163,6 +170,8 @@ public class PlayerLife : MonoBehaviour
         }
 
         playerInstance = SpawnNewPlayer();
+
+        currentPlayerIncrement++;
         
         ResetLife();
 

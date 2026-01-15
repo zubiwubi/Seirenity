@@ -61,6 +61,15 @@ public class PlayerColourApplier : MonoBehaviour
                 renderer.material.SetColor("_BaseColor", c);
             }
         });
+
+        // Set the colour of all objects with PlayerIncrementalColouring
+        FindObjectsByType<PlayerIncrementalChangeColouring>(FindObjectsSortMode.InstanceID).ToList().ForEach(obj =>
+        {
+            if (obj.playerNumber == PlayerLife.Instance.currentPlayerIncrement)
+            {
+                obj.UpdateColour(c);
+            }
+        });
     }
 
     /// <summary>
