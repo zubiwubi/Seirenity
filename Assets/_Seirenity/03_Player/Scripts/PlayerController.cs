@@ -99,11 +99,6 @@ public class PlayerController : MonoBehaviour
 
         
         _colourPickerController = FindAnyObjectByType<ColourPickerController>();
-        if (_colourPickerController == null)
-        {
-            
-            _colourPickerController = null;
-        }
         
         if (splineContainer != null && splineContainer.Spline != null)
         {
