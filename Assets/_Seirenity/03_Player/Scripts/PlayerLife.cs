@@ -128,7 +128,7 @@ public class PlayerLife : MonoBehaviour
     private Coroutine deathCoroutine;
     private Coroutine spawnCoroutine;
 
-    private void StartDeath()
+    public void StartDeath()
     {
         // Stop any pending spawn to avoid race
         if (spawnCoroutine != null)
