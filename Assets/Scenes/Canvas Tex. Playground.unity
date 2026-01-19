@@ -83590,6 +83590,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6876688218003423577, guid: 7c188ab59c3fbb44d82ab63263aaac80, type: 3}
+      propertyPath: m_text
+      value: 'Press [Spacebar] to drift
+
+        Press [Backspace] to enter Overview
+        Mode
+
+'
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
